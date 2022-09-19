@@ -7,10 +7,10 @@ namespace GW2AddonManager
 {
     public partial class MainWindow : Window, IHyperlinkHandler
     {
-        public MainWindow()
+        public MainWindow(MainWindowViewModel mainWindowViewModel)
         {
+            DataContext = mainWindowViewModel;
             InitializeComponent();
-            DataContext = App.Current.Services.GetService<MainWindowViewModel>();
         }
 
         private void TitleBar_MouseHeld(object sender, MouseButtonEventArgs e)
@@ -21,6 +21,6 @@ namespace GW2AddonManager
 
         private void close_clicked(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
-        private void minimize_clicked(object sender, RoutedEventArgs e) => (Parent as Window).WindowState = WindowState.Minimized;
+        private void minimize_clicked(object sender, RoutedEventArgs e) => this.WindowState = WindowState.Minimized;
     }
 }

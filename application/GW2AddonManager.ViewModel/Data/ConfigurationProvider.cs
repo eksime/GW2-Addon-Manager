@@ -1,17 +1,9 @@
 ﻿using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.IO.Abstractions;
 
 namespace GW2AddonManager
 {
-    public interface IConfigurationProvider
-    {
-        string ApplicationVersion { get; }
-
-        Configuration UserConfig { get; set; }
-
-        public string ConfigFileName { get; }
-    }
 
     public class ConfigurationProvider : IConfigurationProvider
     {
@@ -41,13 +33,13 @@ namespace GW2AddonManager
         public ConfigurationProvider(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            UserConfig = Load();
+            _userConfig = Load();
         }
 
         private void Save()
         {
-            var s = JsonConvert.SerializeObject((object)UserConfig);
-            _fileSystem.File.WriteAllText(ConfigFileName, s);
+            using var fs = _fileSystem.File.OpenWrite(ConfigFileName);
+            JsonSerializer.Serialize(fs, (object)UserConfig);
         }
 
         private Configuration Load()
@@ -55,8 +47,8 @@ namespace GW2AddonManager
             if (!_fileSystem.File.Exists(ConfigFileName))
                 return Configuration.Default;
 
-            var s = _fileSystem.File.ReadAllText(ConfigFileName);
-            return JsonConvert.DeserializeObject<Configuration>(s);
+            using var fs = _fileSystem.File.OpenRead(ConfigFileName);
+            return JsonSerializer.Deserialize<Configuration>(fs) ?? Configuration.Default;
         }
     }
 }

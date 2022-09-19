@@ -1,6 +1,8 @@
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Ookii.Dialogs.Wpf;
+using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -34,6 +36,16 @@ namespace GW2AddonManager
                 UpdateLinkVisibility = Visibility.Hidden;
                 await _selfManager.Update();
             });
+        }
+
+        public ICommand OpenExternalUri
+        {
+            get => new RelayCommand<Uri>(uri =>
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = uri.AbsoluteUri,
+                UseShellExecute = true
+            }));
         }
 
         public string GamePath => _configurationProvider.UserConfig.GamePath;

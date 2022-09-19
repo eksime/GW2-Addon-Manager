@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace GW2AddonManager.Localization
+namespace GW2AddonManager.Core.Localization
 {
     public static class CultureConstants
     {

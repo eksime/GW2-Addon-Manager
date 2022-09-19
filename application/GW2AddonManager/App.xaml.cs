@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using GW2AddonManager.UI.Dialogs;
+using GW2AddonManager.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Globalization;
 using System.IO;
@@ -7,6 +9,7 @@ using System.Net;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace GW2AddonManager
 {
@@ -22,14 +25,12 @@ namespace GW2AddonManager
         public App()
         {
             _mutex = new NamedMutex("GW2AddonManager", true);
-
             _serviceProvider = ConfigureServices();
         }
 
         private void ClearMutex()
         {
-            if (_mutex is not null)
-                _mutex.Dispose();
+            _mutex?.Dispose();
             _mutex = null;
         }
 
@@ -44,6 +45,8 @@ namespace GW2AddonManager
                           .AddSingleton<ISelfManager, SelfManager>()
                           .AddSingleton<ILoaderManager, LoaderManager>()
                           .AddSingleton<ICoreManager, CoreManager>()
+                          .AddSingleton<IDialogService, WPFDialogService>()
+                          .AddSingleton<IAddonWatcher, AddonWatcher>()
                           .AddTransient<MainWindowViewModel>()
                           .AddTransient<OpeningViewModel>()
                           .AddTransient<UpdatingViewModel>()
@@ -56,26 +59,14 @@ namespace GW2AddonManager
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
-            #if !DEBUG
             Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(AppDispatcherUnhandledException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomainUnhandledException);
-            #endif
 
             _serviceProvider.GetService<ICoreManager>().UpdateCulture(_serviceProvider.GetService<IConfigurationProvider>().UserConfig.Culture);
             Application.Current.Exit += new ExitEventHandler((_, _) => ClearMutex());
 
             Application.Current.MainWindow = _serviceProvider.GetService<MainWindow>();
             Application.Current.MainWindow.Show();
-        }
-
-        internal void ReopenMainWindow()
-        {
-            var oldWindow = Application.Current.MainWindow;
-            Application.Current.MainWindow = _serviceProvider.GetService<MainWindow>();
-            Application.Current.MainWindow.Show();
-            Application.Current.MainWindow.Top = oldWindow.Top;
-            Application.Current.MainWindow.Left = oldWindow.Left;
-            oldWindow.Close();
         }
 
         private void CurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -90,20 +81,25 @@ namespace GW2AddonManager
             ShowUnhandledException(e);
         }
 
+        [Conditional("DEBUG")]
         private void ShowUnhandledException(DispatcherUnhandledExceptionEventArgs e)
         {
             //LogError(logPath, e);
             string errmsg = "An unhandled exception occurred." + "\n" + e.Exception.Message + (e.Exception.InnerException != null ? "\n" + e.Exception.InnerException.Message : "");
-            if (Popup.Show(errmsg, "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
+
+            IDialogService dialogService = this._serviceProvider.GetRequiredService<IDialogService>();
+            if (dialogService.ShowMessageBox(errmsg, "Critical Error", Core.Services.MessageBoxButton.OK, Core.Services.MessageBoxImage.Error) == Core.Services.MessageBoxResult.OK)
                 Application.Current.Shutdown();
         }
 
+        [Conditional("DEBUG")]
         private void ShowUnhandledException(UnhandledExceptionEventArgs e)
         {
             //LogError(logPath, e);
             Exception exc = (Exception)e.ExceptionObject;
             string errmsg = "An unhandled exception occurred." + "\n" + exc.Message + (exc.InnerException != null ? "\n" + exc.InnerException.Message : "");
-            if (Popup.Show(errmsg, "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
+            IDialogService dialogService = this._serviceProvider.GetRequiredService<IDialogService>();
+            if (dialogService.ShowMessageBox(errmsg, "Critical Error", Core.Services.MessageBoxButton.OK, Core.Services.MessageBoxImage.Error) == Core.Services.MessageBoxResult.OK)
                 Application.Current.Shutdown();
         }
     }

@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-
-namespace GW2AddonManager
+﻿namespace GW2AddonManager
 {
+    using System;
+    using System.Windows;
+    using System.Windows.Input;
+    using System.Windows.Media.Animation;
+    using System.Windows.Threading;
+
     // FIXME: Now using custom popup window, just need sound and optional delay before buttons unfreeze.
     public partial class Popup : Window
     {
@@ -36,8 +26,9 @@ namespace GW2AddonManager
             return (left, top);
         }
 
-        public Popup(string content, string title = "Message Box", MessageBoxButton buttons = MessageBoxButton.OK, MessageBoxImage image = MessageBoxImage.None, int delay = 0)
+        public Popup(Window owner, string content, string title = "Message Box", MessageBoxButton buttons = MessageBoxButton.OK, MessageBoxImage image = MessageBoxImage.None, int delay = 0)
         {
+            Owner = owner;
             var vm = new PopupViewModel(content, title, buttons, image, delay);
             DataContext = vm;
             Opacity = 0;
@@ -87,14 +78,6 @@ namespace GW2AddonManager
         {
             if (e.OriginalSource == sender && e.ChangedButton == MouseButton.Left)
                 DragMove();
-        }
-
-        public static MessageBoxResult Show(string content, string title = "Message Box", MessageBoxButton buttons = MessageBoxButton.OK, MessageBoxImage image = MessageBoxImage.None, int delay = 0)
-        {
-            var p = new Popup(content, title, buttons, image, delay);
-            _ = p.ShowDialog();
-
-            return p.Result;
         }
     }
 }

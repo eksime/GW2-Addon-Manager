@@ -1,4 +1,4 @@
-﻿using GW2AddonManager.Localization;
+﻿using GW2AddonManager.Core.Localization;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -59,7 +59,8 @@ namespace GW2AddonManager
             Thread.Sleep(500);
 
             _ = Process.Start("Updater.exe");
-            Application.Current.Shutdown();
+            //todo: request shutdown
+            //Application.Current.Shutdown();
         }
     }
 }

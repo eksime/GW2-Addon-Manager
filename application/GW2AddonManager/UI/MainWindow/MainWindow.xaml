@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:l="clr-namespace:GW2AddonManager.Localization"
+    xmlns:l="clr-namespace:GW2AddonManager.Core.Localization;assembly=GW2AddonManager.Core"
     xmlns:a="clr-namespace:GW2AddonManager"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=a:MainWindowViewModel}"
@@ -80,17 +80,22 @@
                 Foreground="DimGray"
                   Margin="5,0,5,0"
                 >
-                <Hyperlink NavigateUri="https://github.com/gw2-addon-loader/GW2-Addon-Manager/wiki" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="None" FocusVisualStyle="{x:Null}">
+                <Hyperlink
+                    NavigateUri="https://github.com/gw2-addon-loader/GW2-Addon-Manager/wiki"
+                    TextDecorations="None"
+                    FocusVisualStyle="{x:Null}"
+                    Command="{Binding OpenExternalUri}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=NavigateUri}">
                      <TextBlock Text="Wiki " FontFamily="Microsoft YaHei UI"/>
                 </Hyperlink>
                 |
                 <Hyperlink
                     NavigateUri="https://github.com/gw2-addon-loader/GW2-Addon-Manager/wiki/Other-Useful-Programs"
-                    RequestNavigate="Hyperlink_RequestNavigate"
                     TextDecorations="None"
                     FocusVisualStyle="{x:Null}"
-                    ToolTip="{x:Static l:StaticText.ProgramsNotManagedByThisApplication}"
-                    >
+                    Command="{Binding OpenExternalUri}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=NavigateUri}"
+                    ToolTip="{x:Static l:StaticText.ProgramsNotManagedByThisApplication}" >
                      <TextBlock Text="{x:Static l:StaticText.CompanionApplicationsWithLeadingSpace}" FontFamily="Microsoft YaHei UI"/>
                 </Hyperlink>
             </TextBlock>
@@ -121,7 +126,7 @@
 
         </DockPanel>
 
-        <Label Grid.Row="1" FontWeight="Bold" FontSize="40" Foreground="DimGray" Margin="30,0,0,0" FontFamily="Microsoft JhengHei UI Light" Width="Auto" HorizontalAlignment="Left" Content="Guild Wars 2 Unofficial Addon Manager"/>
+        <Label Grid.Row="1" FontWeight="Bold" FontSize="40" Foreground="DimGray" Margin="30,0,0,0" FontFamily="Microsoft JhengHei UI Light" Width="Auto" HorizontalAlignment="Left" Content="Guild Wars 2 Addon Manager"/>
 
         <Frame x:Name="mainFrame" Source="../OpeningPage/OpeningView.xaml" NavigationUIVisibility="Hidden" Grid.Row="2" VerticalAlignment="Stretch" Margin="40,0,100,0"/>
     </Grid>

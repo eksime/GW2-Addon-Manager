@@ -1,4 +1,5 @@
-﻿using GW2AddonManager.Localization;
+﻿using GW2AddonManager.Core.Localization;
+using GW2AddonManager.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,40 +29,38 @@ namespace GW2AddonManager
     {
         private readonly IConfigurationProvider _configurationProvider;
         private readonly IFileSystem _fileSystem;
+        private readonly IDialogService _dialogService;
 
         public event LogEventHandler Log;
         public event EventHandler Uninstalling;
 
-        public CoreManager(IConfigurationProvider configurationProvider, IFileSystem fileSystem)
+        public CoreManager(IConfigurationProvider configurationProvider, IFileSystem fileSystem, IDialogService dialogService)
         {
             _configurationProvider = configurationProvider;
             _fileSystem = fileSystem;
+            _dialogService = dialogService;
         }
 
         public void Uninstall()
         {
-            if(_configurationProvider.UserConfig.GamePath is null || !_fileSystem.Directory.Exists(_configurationProvider.UserConfig.GamePath))
+            if (_configurationProvider.UserConfig.GamePath is null || !_fileSystem.Directory.Exists(_configurationProvider.UserConfig.GamePath))
             {
-                _ = Popup.Show(StaticText.NoGamePath, StaticText.ResetToCleanInstall, MessageBoxButton.OK, MessageBoxImage.Error);
+                this._dialogService.ShowMessageBox(StaticText.NoGamePath, StaticText.ResetToCleanInstall, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            if (Popup.Show(StaticText.ResetToCleanInstallWarning, StaticText.ResetToCleanInstall, MessageBoxButton.YesNo, MessageBoxImage.Hand) != MessageBoxResult.Yes)
+            if (this._dialogService.ShowMessageBox(StaticText.ResetToCleanInstallWarning, StaticText.ResetToCleanInstall, MessageBoxButton.Yes | MessageBoxButton.No, MessageBoxImage.Hand) != MessageBoxResult.Yes)
                 return;
 
             Uninstalling?.Invoke(this, new EventArgs());
 
-            _configurationProvider.UserConfig = _configurationProvider.UserConfig with
-            {
-                AddonsState = new Dictionary<string, AddonState>()
-            };
-
-            if(_fileSystem.File.Exists(_configurationProvider.ConfigFileName))
+            if (_fileSystem.File.Exists(_configurationProvider.ConfigFileName))
                 _fileSystem.File.Delete(_configurationProvider.ConfigFileName);
 
-            _ = Popup.Show(StaticText.ResetToCleanInstallDone, StaticText.ResetToCleanInstall, MessageBoxButton.OK);
+            this._dialogService.ShowMessageBox(StaticText.ResetToCleanInstallDone, StaticText.ResetToCleanInstall, MessageBoxButton.OK);
 
-            Application.Current.Shutdown();
+            //todo: request shutdown
+            //Application.Current.Shutdown();
         }
 
         public void UpdateCulture(string constant)
@@ -79,8 +78,10 @@ namespace GW2AddonManager
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
 
-            if (needsChange)
-                App.Current.ReopenMainWindow();
+
+            //todo: recreate main window
+            //if (needsChange)
+            //    App.Current.ReopenMainWindow();
         }
 
         public void AddLog(string msg)

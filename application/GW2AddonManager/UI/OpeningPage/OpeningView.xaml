@@ -3,24 +3,26 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:l="clr-namespace:GW2AddonManager.Localization"
-    xmlns:a="clr-namespace:GW2AddonManager" xmlns:xkct="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:l="clr-namespace:GW2AddonManager.Core.Localization;assembly=GW2AddonManager.Core"
+    xmlns:a="clr-namespace:GW2AddonManager"
+    xmlns:local="clr-namespace:GW2AddonManager.UI.Controls"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=a:OpeningViewModel}"
     x:Class="GW2AddonManager.OpeningView"
     d:DesignHeight="464"
     d:DesignWidth="990"
     ShowsNavigationUI="False"
-    x:Name="OpeningViewPage"
-    >
+    FontFamily="Microsoft YaHei UI"
+    FontSize="13"
+    x:Name="OpeningViewPage" >
 
     <Page.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Page.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="1.5*"/>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
@@ -28,47 +30,52 @@
             <RowDefinition Height="405"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <DockPanel HorizontalAlignment="Stretch" Grid.Column="0" Background="#99FFFFFF">
-            <Label DockPanel.Dock="Top" FontSize="18" FontFamily="Microsoft YaHei UI" HorizontalAlignment="Center" Foreground="DimGray" Content="{x:Static l:StaticText.AddOns}" FontWeight="Bold"/>
-            <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" Padding="8" FontSize="13" FontFamily="Microsoft YaHei UI" Text="{x:Static l:StaticText.SelectAllAddonsDescription}" HorizontalAlignment="Center"/>
-            <Grid DockPanel.Dock="Top" Margin="0,0,0,5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="6*"/>
-                    <ColumnDefinition Width="10*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="10*"/>
-                    <ColumnDefinition Width="6*"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="1" Command="{Binding CheckAllAddons}" IsEnabled="{Binding NotAllAddonsChecked}">Select All</Button>
-                <Button Grid.Column="3" Command="{Binding UncheckAllAddons}" IsEnabled="{Binding AnyAddonChecked}">Select None</Button>
-            </Grid>
-            <ListBox DockPanel.Dock="Bottom" Name="AddonsList"
-                         ItemsSource="{Binding Addons}"
-                         ItemContainerStyle="{StaticResource AddonListItem}"
-                         SelectedItem="{Binding SelectedAddon, Mode=TwoWay}"
-                         BorderThickness="0"
-                         Background="WhiteSmoke"
-                         SelectionMode="Extended"
-                         KeyUp="AddonsList_KeyUp"
-                         Style="{DynamicResource ScrollableAddonListBox}">
+        <DockPanel HorizontalAlignment="Stretch" Grid.Column="0">
+            <Label
+                DockPanel.Dock="Top"
+                FontSize="18"
+                HorizontalAlignment="Center"
+                Foreground="DimGray"
+                Content="{x:Static l:StaticText.AddOns}"
+                FontWeight="Bold"/>
+            
+            <ListBox Name="AddonsList"
+                    ItemsSource="{Binding Addons}"
+                    ItemContainerStyle="{StaticResource AddonListItem}"
+                    IsSynchronizedWithCurrentItem="True"
+                    BorderThickness="0"
+                    Background="#99FFFFFF"
+                    SelectionMode="Extended"
+                    KeyUp="AddonsList_KeyUp"
+                    HorizontalContentAlignment="Stretch"
+                    Style="{DynamicResource ScrollableAddonListBox}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox Name="AddonIsSelected"
-                                      Padding="5,5,0,5"
-                                      VerticalAlignment="Center"
-                                      IsChecked="{Binding AddonChecked}"
-                                      Command="{Binding ElementName=OpeningViewPage, Path=DataContext.CheckAddon}"
-                                      Style="{StaticResource AddonListCheckBox}">
-                            </CheckBox>
-                            <Label Name="DisplayName"
-                                       Content="{Binding Addon.AddonName}"
-                                       VerticalAlignment="Center"
-                                       FontFamily="Microsoft YaHei UI"
-                                       Foreground="DimGray"
-                                       FontWeight="Bold"
-                                       FontSize="13"/>
-                        </StackPanel>
+                        <DockPanel>
+                            <StackPanel
+                                DockPanel.Dock="Right"
+                                Orientation="Horizontal">
+                                
+                                <Button
+                                    Command="{Binding InstallCommand}"
+                                    Content="I"
+                                    ToolTip="Install Addon"
+                                    Width="24" Height="24"/>
+                                
+                                <Button
+                                    Command="{Binding UninstallCommand}"
+                                    Content="U"
+                                    ToolTip="Uninstall Addon"
+                                    Width="24" Height="24"/>
+                            </StackPanel>
+
+                            <Label
+                                Name="AddonIsSelected"
+                                Padding="5,5,0,5"
+                                VerticalAlignment="Center"
+                                Content="{Binding Model.AddonName}">
+                            </Label>
+                        </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -79,80 +86,95 @@
                 <RowDefinition Height="5"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="0" DataContext="{Binding Addons/}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" FontSize="18" FontFamily="Microsoft YaHei UI" HorizontalAlignment="Stretch" Foreground="DimGray" Content="{x:Static l:StaticText.Description}" FontWeight="Bold"/>
+                <Label
+                    Grid.Row="0" Grid.Column="0"
+                    FontSize="18"
+                    HorizontalAlignment="Stretch"
+                    Foreground="DimGray"
+                    Content="{Binding Name}"
+                    FontWeight="Bold"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="1" FontSize="13"
-                        FontFamily="Microsoft YaHei UI"
-                        Padding="10"
-                        Foreground="DimGray"
-                        HorizontalAlignment="Stretch"
-                        Visibility="{Binding DeveloperVisibility}"
-                        >
+                <TextBlock
+                    Grid.Row="1" Grid.Column="0"
+                    Margin="4,0"
+                    Foreground="DimGray"
+                    HorizontalAlignment="Stretch"
+                    Visibility="Visible">
+                    
                     <TextBlock Text="{x:Static l:StaticText.DevelopersColonSpace}"/>
-                    <Hyperlink NavigateUri="{Binding AddonWebsiteLink, TargetNullValue=about:blank}" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="None" FocusVisualStyle="{x:Null}">
-                        <TextBlock Text="{Binding DeveloperText}"/>
+                    <!--todo: requrstnavigate-->
+                    <Hyperlink
+                        Command="{Binding DataContext.OpenExternalUri, ElementName=OpeningViewPage}"
+                        CommandParameter="{Binding Website}"
+                        TextDecorations="None"
+                        ToolTip="{Binding Website}"
+                        FocusVisualStyle="{x:Null}">
+                        <TextBlock Text="{Binding Developer}"/>
                     </Hyperlink>
                 </TextBlock>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                       Margin="10"
+                <TextBlock Grid.Row="2" Grid.Column="0"
+                       Margin="4"
                         Name="descriptionTextBlock"
                         TextWrapping="Wrap"
-                        FontFamily="Microsoft JhengHei UI Light"
-                        Text="{Binding DescriptionText}" FontSize="13"/>
-            </Grid>
-            <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" Visibility="{Binding LogVisibility}"/>
-            <Grid Grid.Row="2" Visibility="{Binding LogVisibility}">
-                <TextBox IsEnabled="False" Text="{Binding Log}" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible"/>
-            </Grid>
-        </Grid>
+                        Text="{Binding Description}"
+                           FontSize="13"/>
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="1" VerticalAlignment="Center" Height="50">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="{x:Static l:StaticText.Install}" Command="{Binding Path=InstallSelected}" IsEnabled="{Binding CanInstallAny}"
-                      HorizontalContentAlignment="Center"
-                      VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch"
-                      Height="35" Margin="2"
-              Background="WhiteSmoke"
-                          ToolTip="{x:Static l:StaticText.InstallDescription}"/>
-            <Button Grid.Column="1" Content="{x:Static l:StaticText.Delete}" Command="{Binding Path=DeleteSelected}" IsEnabled="{Binding CanDeleteAny}"
-                      HorizontalContentAlignment="Center"
-                      VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch"
-                      Height="35" Margin="2"
-              Background="WhiteSmoke"
-                          ToolTip="{x:Static l:StaticText.DeleteDescription}"/>
-            <Button Grid.Column="2" Content="{x:Static l:StaticText.Disable}" Command="{Binding Path=DisableSelected}" IsEnabled="{Binding CanDisableAny}"
-                      HorizontalContentAlignment="Center"
-                      VerticalContentAlignment="Center"
-                      Height="35" Margin="2"
-              Background="WhiteSmoke"
-                          ToolTip="{x:Static l:StaticText.DisableDescription}"/>
-            <Button Grid.Column="3" Content="{x:Static l:StaticText.ReEnable}" Command="{Binding Path=EnableSelected}" IsEnabled="{Binding CanEnableAny}"
-                      HorizontalContentAlignment="Center"
-                      VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch"
-                      Height="35" Margin="2"
-              Background="WhiteSmoke"
-                          ToolTip="{x:Static l:StaticText.ReEnableDescription}"/>
-        </Grid>
+                <TextBlock Grid.Row="1" Grid.Column="2"
+                               Text="Dependencies"
+                               Foreground="DimGray"/>
 
+                <ItemsControl
+                    Margin="0,4"
+                    Grid.Row="2" Grid.Column="2"
+                    ItemsSource="{Binding Dependencies}"/>
+            </Grid>
+            <!--<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" Visibility="Visible"/>
+            <ItemsControl Grid.Row="2" ItemsSource="{Binding LogLines}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <ScrollViewer
+                            CanContentScroll="True" 
+                            Focusable="False">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+            </ItemsControl>-->
+        </Grid>
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+            <Button Command="{Binding Path=InstallManager}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Height="35"
+                    Width="130"
+                    Content="{x:Static l:StaticText.Install}"/>
+            <Button Command="{Binding Path=UninstallManager}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Height="35"
+                    Width="130"
+                    Content="{x:Static l:StaticText.Delete}"/>
+        </StackPanel>
         <DockPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="50">
             <Button Command="{Binding Path=CleanInstall}"
                       HorizontalContentAlignment="Center"
@@ -165,31 +187,26 @@
                       ToolTip="{x:Static l:StaticText.ResetToCleanInstallDescription}"
                     Content="{x:Static l:StaticText.ResetToCleanInstall}"/>
 
-            <xkct:SplitButton x:Name="nextPage" Content="{x:Static l:StaticText.Play}" d:Content="Play"
+            <local:SplitButton
+                x:Name="nextPage"
+                Content="{x:Static l:StaticText.Play}"
+                d:Content="Play"
                 DockPanel.Dock="Right"
                 MinWidth="200"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"
-                Background="#FF2A7EAE"
                 FontFamily="Microsoft YaHei UI"
                 FontSize="20"
                 Height="45"
-                BorderThickness="2"
                 BorderBrush="#FF61ADD9"
+                Command="{Binding LaunchGame}"
                 Padding="15,0,15,0" FontWeight="Bold">
-                <xkct:SplitButton.DropDownContent>
-                    <Menu>
-                        <Menu.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Vertical" />
-                            </ItemsPanelTemplate>
-                        </Menu.ItemsPanel>
-                        <MenuItem IsCheckable="True" Header="Start game afterwards"/>
-                        <MenuItem IsCheckable="True" Header="Start custom launcher afterwards"/>
-                        <MenuItem Header="Set custom launcher path&#x2026;"/>
-                    </Menu>
-                </xkct:SplitButton.DropDownContent>
-            </xkct:SplitButton>
+                <local:SplitButton.MenuItems>
+                    <MenuItem IsCheckable="True" Header="Start game afterwards"/>
+                    <MenuItem IsCheckable="True" Header="Start custom launcher afterwards"/>
+                    <MenuItem Header="Set custom launcher path&#x2026;"/>
+                </local:SplitButton.MenuItems>
+            </local:SplitButton>
         </DockPanel>
     </Grid>
 </Page>

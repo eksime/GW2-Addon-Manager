@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:l="clr-namespace:GW2AddonManager.Localization"
+    xmlns:l="clr-namespace:GW2AddonManager.Core.Localization;assembly=GW2AddonManager.Core"
     xmlns:a="clr-namespace:GW2AddonManager"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=a:UpdatingViewModel}"
@@ -26,7 +26,10 @@
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10">
                 <TextBlock VerticalAlignment="Center" Text="{x:Static l:StaticText.ViewOnGithub}"/>
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0">
-                        <Hyperlink NavigateUri="https://github.com/gw2-addon-loader/GW2-Addon-Manager" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="None">
+                        <!--todo: request navigate-->
+                        <Hyperlink
+                            NavigateUri="https://github.com/gw2-addon-loader/GW2-Addon-Manager"
+                            TextDecorations="None">
                             <Image Margin="5" Source="/Resources/GitHub-Mark-32px.png" Height="16"/>
                         </Hyperlink>
                 </TextBlock>

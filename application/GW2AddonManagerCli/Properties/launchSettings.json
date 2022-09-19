@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GW2AddonManagerCli": {
+      "commandName": "Project",
+      "commandLineArgs": "install arcdps"
+    }
+  }
+}

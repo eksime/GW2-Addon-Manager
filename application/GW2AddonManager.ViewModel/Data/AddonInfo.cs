@@ -1,31 +1,26 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-
-namespace GW2AddonManager
+﻿namespace GW2AddonManager
 {
+    using System.Collections.Generic;
+
     public enum DownloadType
     {
-        [EnumMember(Value = "dll")]
         DLL,
-        [EnumMember(Value = "archive")]
-        Archive
+        Archive,
     }
 
     public enum InstallMode
     {
-        [EnumMember(Value = "binary")]
         Binary,
-        [EnumMember(Value = "arc")]
-        ArcDPSAddon
+        Arc,
+        Loader,
     }
 
-    [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
+    public enum HostType
+    {
+        standalone,
+        github,
+    }
+
     public record AddonInfo(
         string Nickname,
         string Developer,
@@ -33,12 +28,10 @@ namespace GW2AddonManager
         string AddonName,
         string Description,
         string Tooltip,
-        string HostType,
+        HostType HostType,
         string HostUrl,
         string VersionUrl,
-        [JsonConverter(typeof(StringEnumConverter))]
         DownloadType DownloadType,
-        [JsonConverter(typeof(StringEnumConverter))]
         InstallMode InstallMode,
         string PluginName,
         string PluginNamePattern,
